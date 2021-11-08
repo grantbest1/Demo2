@@ -1,0 +1,61 @@
+#include <Wire.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#define SLAVE_ADDRESS 0x04
+//int number = 0;
+int tate = 0;
+int offset = 0;
+char data[64] = "";
+int i = 0;
+float angle = 0.0;
+float distance = 0.0;
+char dis[64] = "";
+int sign = 1;
+void recieveData(int);
+void sendData();
+
+void setup() {
+  pinMode(3, OUTPUT);
+  Serial.begin(9600); // start serial for output
+  // initialize i2c as slave
+  Wire.begin(SLAVE_ADDRESS);
+
+  // define callbacks for i2c communication
+  Wire.onReceive(receiveData);
+
+  Serial.println("Ready!");
+}
+
+void loop() {
+  delay(100);
+}
+
+
+// callback for received data
+void receiveData(int byteCount) {
+  Wire.read();
+  while (Wire.available()) {
+    data[i] = Wire.read();
+    if (data[i] == 32) {
+      break;
+    }    
+    i++;
+  }
+  i = 0;
+  while (Wire.available()) {
+    dis[i] = Wire.read();
+    i++;
+  }
+  i = 0;
+  angle = atof(data);
+  distance = atof(dis);
+  Serial.println(angle);
+  Serial.print("Distance is: ");
+  Serial.println(distance);
+
+
+  Wire.read();
+  Wire.flush();
+}
