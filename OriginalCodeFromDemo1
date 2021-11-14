@@ -125,6 +125,13 @@ void setup() {
 
 
 void loop() {
+
+ /*
+  phi ( the angle of the whole robot from starting position) += (translational_velocity_right - translational_velocity_left)/b; (b being wheel base width)
+  distance_on_x_axis = cos(phi)*(translational_velocity_left + translational_velocity_right)/2;
+  distance_on_y_axis = sin(phi)*(translational_velocity_left + translational_velocity_right)/2;
+  */
+
   if(flag == true){
     tNew = micros();
     master_time = (tNew - tOld);
@@ -180,6 +187,10 @@ void moveDistance(float desDist){
     md.setM1Speed(0);
     md.setM2Speed(0);
   }
+  
+ 
+  
+  
 }
 
 
@@ -196,6 +207,8 @@ void updateLeftEncoder(){
     deltaCount_left = newCount_left - oldCount_left;
     //thetadot is the angular velocity
     thetaDot_left = (deltaCount_left*1000000*2*3.1415)/((deltaT_left)*800);
+    // translational_velocity_left (in feet/second) = thetaDot_left * r;
+    //
 
     
     
@@ -208,7 +221,7 @@ void updateLeftEncoder(){
       counter_left --;
       currentDir_left = "CW";
     }
-    rad_left = (counter_left*2*PI)/800;
+    rad_left = (counter_left*2*PI)/800;  // Do we want to make this ((counter_left % 800)*2*PI)/800; ?
     newCount_left = counter_left;
     tOld_left = micros();
     flag = true;
@@ -230,6 +243,7 @@ void updateRightEncoder(){
     deltaCount_right = newCount_right-oldCount_right;
     //thetadot is the angular velocity
     thetaDot_right = (deltaCount_right*1000*2*PI)/((deltaT_right)*800);
+    // translational_velocity_right (in feet/second) = thetaDot_right * r;
       
     
     oldCount_right = counter_right;
@@ -240,7 +254,7 @@ void updateRightEncoder(){
       counter_right ++;
       currentDir_right = "CW";
     }
-    rad_right = (counter_right*2*PI)/800;
+    rad_right = (counter_right*2*PI)/800;  // Do we want to make this ((counter_right % 800)*2*PI)/800; ?
     newCount_right = counter_right;
     tOld_right=micros();
     flag = true;
