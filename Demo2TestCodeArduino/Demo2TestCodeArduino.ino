@@ -63,6 +63,7 @@ bool flag = false;
 float dist = 0;
 double phi = 0; // current angle from straight
 
+
 //int number = 0;
 int tate = 0;
 int offset = 0;
@@ -74,6 +75,8 @@ char dis[64] = "";
 int sign = 1;
 void recieveData(int);
 void sendData();
+char tape[64];
+int halt = 0;
 
 //if the motor shield has a fault it will tell the user
 void stopIfFault()
@@ -115,10 +118,13 @@ void setup() {
   Serial.println("Ready!");
 }
 
+
+
 void loop() {
+  static state_t state = ID;
+
+  //prints and does calculations
   if(flag == true){
-    tNew = micros();
-    master_time = (tNew - tOld);
     dist = (counter_left + counter_right)*1.57/(2*800);
     phi = float((-36.0*(counter_right))/(157.0));
       Serial.print(counter_right);
@@ -131,15 +137,53 @@ void loop() {
       Serial.println();
       flag = false;
   }
-  if(moveFlag<=1000){
-  rotate(angle);
-  }else if(moveFlag>=1000){
-    if(moving == false){
-      moving = true;
-      counter_left = 0;
-      counter_right = 0;
-    }
-    moveDistance(distance);
+
+  //case statement
+  switch(state){
+    case ID:
+      //run comp vision
+      moving = false;
+      if (tape == 1){
+        state = TAPE_FOUND;
+        counter_left = 0;
+        counter_right = 0;
+      }else{
+        rotate(10);
+      }
+      break;
+    case TAPE_FOUND:
+      if(angle != 0.0){
+        state = ROTATE;
+      }else{
+        state = ID;
+      }
+      break;
+    case ROTATE:
+      if(phi!=angle){
+        rotate(angle);
+      }else{
+        state = CHECK_ANGLE;
+      }
+      break;
+    case CHECK_ANGLE:
+      if(phi<=angle+2 && phi>=angle-2){
+        state = ROTATE;
+      }else{
+        state = MOVE;
+      }
+      break;
+    case MOVE:
+      if(moving == false){
+        moving = true;
+        counter_left = 0;
+        counter_right = 0;
+      }
+      if(tape == 1){
+        moveDistance(1);
+      }else{
+        //done;
+      }
+      break;
   }
 }
 
@@ -150,6 +194,7 @@ void receiveData(int byteCount) {
   Wire.read();
   while (Wire.available()) {
     data[i] = Wire.read();
+    //Breaks off angle when space is found
     if (data[i] == 32) {
       break;
     }    
@@ -157,12 +202,13 @@ void receiveData(int byteCount) {
   }
   i = 0;
   while (Wire.available()) {
-    dis[i] = Wire.read();
+    //Defines tape as either one or zero (one if found)
+    tape[i] = Wire.read();
     i++;
   }
   i = 0;
   angle = atof(data);
-  distance = atof(dis);
+  //distance = atof(dis);
   Serial.println(angle);
   Serial.print("Distance is: ");
   Serial.println(distance);
