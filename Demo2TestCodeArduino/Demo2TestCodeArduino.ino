@@ -77,7 +77,7 @@ void recieveData(int);
 void sendData();
 char tape[64];
 int halt = 0;
-
+enum state_t {ID,TAPE_FOUND, ROTATE, CHECK_ANGLE, MOVE};
 //if the motor shield has a fault it will tell the user
 void stopIfFault()
 {
