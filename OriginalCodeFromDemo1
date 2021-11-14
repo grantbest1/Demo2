@@ -126,10 +126,15 @@ void setup() {
 
 void loop() {
 
- /*
-  phi ( the angle of the whole robot from starting position) += (translational_velocity_right - translational_velocity_left)/b; (b being wheel base width)
-  distance_on_x_axis = cos(phi)*(translational_velocity_left + translational_velocity_right)/2;
-  distance_on_y_axis = sin(phi)*(translational_velocity_left + translational_velocity_right)/2;
+ /* I dont know where all the code directly below is supposed to go, but this is the right math 
+ 
+  velocity_of_phi ( the angle of the whole robot from starting position) += (translational_velocity_right - translational_velocity_left)/b; (b being wheel base width)
+  velocity_on_x_axis = cos(phi)*(translational_velocity_left + translational_velocity_right)/2;
+  velocity_on_y_axis = sin(phi)*(translational_velocity_left + translational_velocity_right)/2;
+  
+  distance_on_x_axis += master_time (i think) * cos(phi_old)*(translational_velocity_left + translational_velocity_right)/2;
+  distance_on_y_axis += master_time (i think) * sin(phi_old)*(translational_velocity_left + translational_velocity_right)/2;
+  total_phi += master_time*(r/b)*(translational_velocity_left - translational_velocity_right);   <---- I think this whole thing should be modded that way a complete circle goes back to 0*
   */
 
   if(flag == true){
